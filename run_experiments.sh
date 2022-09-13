@@ -3,6 +3,7 @@
 NUMBER_MACHINE=$1
 ROUNDS=$2
 SEQ_NSERVICES=$(seq 1 1 $3)
+DURATION=$4
 BROKER_IP=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 NUM_SCENARIOS=6
 #VIDEO_SOURCE_HIGH_TRAFFIC="/usr/videos/manha_muito_movimento_traseira.mp4"
@@ -77,13 +78,14 @@ sleep 10
 set_scenario()
 {
 	case $1 in
-		7) 
+		1) 
 			echo ">>>> SCENARIO 1 <<<<<"
 			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_FULL
 			CAMERA_FRAME_WIDTH="1920"
 			CAMERA_FRAME_HEIGHT="1080"
 			EXPERIMENT_RESOLUTION="1920_1080"
-			EXPERIMENT_SHIFT="high"	
+			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=false	
 			;;
 		2) 	
 			echo ">>>> SCENARIO 2 <<<<<"
@@ -92,6 +94,7 @@ set_scenario()
 			CAMERA_FRAME_HEIGHT="720"
 			EXPERIMENT_RESOLUTION="1280_720"
 			EXPERIMENT_SHIFT="high"	
+			kafka_retetion_enabled=false
 			;;
 		3) 	
 			echo ">>>> SCENARIO 3 <<<<<"
@@ -100,39 +103,35 @@ set_scenario()
 			CAMERA_FRAME_HEIGHT="480"
 			EXPERIMENT_RESOLUTION="854_480"
 			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=false
 			;;
-		# 4) 	
-		# 	echo ">>>> SCENARIO 4 <<<<<"
-		# 	CAMERA_CONFIG_SOURCE=$VIDEO_SOURCE_LOW_TRAFFIC
-		# 	CAMERA_FRAME_WIDTH="1920"
-		# 	CAMERA_FRAME_HEIGHT="1080"
-		# 	EXPERIMENT_RESOLUTION="1920_1080"
-		# 	EXPERIMENT_SHIFT="low"
-		# 	;;
-		# 5) 
-		# 	echo ">>>> SCENARIO 5 <<<<<"
-		# 	CAMERA_CONFIG_SOURCE=$VIDEO_SOURCE_LOW_TRAFFIC
-		# 	CAMERA_FRAME_WIDTH="1200"
-		# 	CAMERA_FRAME_HEIGHT="800"
-		# 	EXPERIMENT_RESOLUTION="1200_800"
-		# 	EXPERIMENT_SHIFT="low"
-		# 	;;
-		# 6) 
-		# 	echo ">>>> SCENARIO 6 <<<<<"
-		# 	CAMERA_CONFIG_SOURCE=$VIDEO_SOURCE_LOW_TRAFFIC
-		# 	CAMERA_FRAME_WIDTH="960"
-		# 	CAMERA_FRAME_HEIGHT="540"
-		# 	EXPERIMENT_RESOLUTION="960_540"
-		# 	EXPERIMENT_SHIFT="low"
-		# 	;;
-		# 1) 
-		# 	echo ">>>> SCENARIO 1* <<<<<"
-		# 	CAMERA_CONFIG_SOURCE=$VIDEO_SOURCE_HIGH_TRAFFIC
-		# 	CAMERA_FRAME_WIDTH="1280"
-		# 	CAMERA_FRAME_HEIGHT="720"
-		# 	EXPERIMENT_RESOLUTION="1280_720"
-		# 	EXPERIMENT_SHIFT="high"	
-		# 	;;
+		4) 
+			echo ">>>> SCENARIO 4 <<<<<"
+			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_FULL
+			CAMERA_FRAME_WIDTH="1920"
+			CAMERA_FRAME_HEIGHT="1080"
+			EXPERIMENT_RESOLUTION="1920_1080"
+			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=true				
+			;;
+		5) 	
+			echo ">>>> SCENARIO 5 <<<<<"
+			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_720
+			CAMERA_FRAME_WIDTH="1280"
+			CAMERA_FRAME_HEIGHT="720"
+			EXPERIMENT_RESOLUTION="1280_720"
+			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=true	
+			;;
+		6) 	
+			echo ">>>> SCENARIO 6 <<<<<"
+			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_480
+			CAMERA_FRAME_WIDTH="854"
+			CAMERA_FRAME_HEIGHT="480"
+			EXPERIMENT_RESOLUTION="854_480"
+			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=true
+			;;
 		*) 
 			echo "Invalid input!"
 			exit	
@@ -157,11 +156,16 @@ run_experiment()
 		echo "##### STARTING SERVICES #####"
 
 		echo ""
-		echo "# RUNNING BROKER MODULE"
-
+		echo "# RUNNING BROKER MODULE"			
+		
+		EXTRA_KAFKA=""
+		if $kafka_retetion_enabled ; then
+			EXTRA_KAFKA="-e KAFKA_LOG_RETENTION_MS=10000 -e KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS=5000"
+		fi
+		
 		docker run -d --rm --name zookeeper --net=arquitetura-network -p 2181:2181 $IMAGE_ZOOKEEPER
 		sleep 10
-		docker run -d --rm --name broker --net=arquitetura-network -p 29092:29092 -e KAFKA_LISTENERS="EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092" -e KAFKA_ADVERTISED_LISTENERS="INTERNAL://broker:9092,EXTERNAL_SAME_HOST://${BROKER_IP}:29092" -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT" -e KAFKA_INTER_BROKER_LISTENER_NAME="INTERNAL" -e KAFKA_ZOOKEEPER_CONNECT="zookeeper:2181" -e KAFKA_BROKER_ID="2" $IMAGE_KAFKA
+		docker run -d --rm --name broker --net=arquitetura-network -p 29092:29092 -e KAFKA_LISTENERS="EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092" -e KAFKA_ADVERTISED_LISTENERS="INTERNAL://broker:9092,EXTERNAL_SAME_HOST://${BROKER_IP}:29092" -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT" -e KAFKA_INTER_BROKER_LISTENER_NAME="INTERNAL" -e KAFKA_ZOOKEEPER_CONNECT="zookeeper:2181" -e KAFKA_BROKER_ID="2" $EXTRA_KAFKA $IMAGE_KAFKA
 		sleep $WAIT_KAFKA
 
 		echo ""
@@ -206,31 +210,20 @@ run_experiment()
 		echo ""
 		echo "##### INITIALIZING TIMER #####"
 		sleep 10
-		echo "9 minutes left"
-		sleep 60
-		echo "8 minutes left"
-		sleep 60
-		echo "7 minutes left"
-		sleep 60
-		echo "6 minutes left"
-		sleep 60
-		echo "5 minutes left"
-		sleep 60
-		echo "4 minutes left"
-		sleep 60
-		echo "3 minutes left"
-		sleep 60
-		echo "2 minutes left"
-		sleep 60
-		echo "1 minute left"
-		sleep 60
+		for (( m=$DURATION; m>=1; m-- )) # Select scenario
+		do
+			echo "$m minutes left"
+			sleep 60		
+		done		
 
 		echo ""
 		echo "##### COLLECTING DATA #####"
 
+		TIME_COLLECTION=$[$DURATION*60]
+
 		for metric in ${MetricArrayGlobal[*]};
 		do
-			curl -Ss "http://localhost:19999/api/v1/data?chart=${metric}&format=csv&after=-540&group=max&points=30&options=nonzero" > $RESULTS_DIR/$NSERVICES/global_${metric}_${EXPERIMENT_MACHINE}_${EXPERIMENT_SHIFT}_${EXPERIMENT_RESOLUTION}_${SEQUENCE}.csv
+			curl -Ss "http://localhost:19999/api/v1/data?chart=${metric}&format=csv&after=-${TIME_COLLECTION}&group=max&points=30&options=nonzero" > $RESULTS_DIR/$NSERVICES/global_${metric}_${EXPERIMENT_MACHINE}_${EXPERIMENT_SHIFT}_${EXPERIMENT_RESOLUTION}_${SEQUENCE}.csv
 		done
 
 		for container in ${ContainerArray[*]};
@@ -241,13 +234,7 @@ run_experiment()
 				ID_CONTAINER=$(docker ps -aqf "name=${NAME_CONTAINER}")  
 				for metric in ${MetricArrayPerContainer[*]};
 				do
-					#if [ $EXPERIMENT_MACHINE == "jetson" ]
-					#then
-					#	LABEL_CONTAINER=$ID_CONTAINER
-					#else
-					#LABEL_CONTAINER=$NAME_CONTAINER
-					#fi
-					curl -Ss "http://localhost:19999/api/v1/data?chart=cgroup_${NAME_CONTAINER}.${metric}&format=csv&after=-540&group=max&points=30&options=nonzero" > $RESULTS_DIR/$NSERVICES/${NAME_CONTAINER}_${metric}_SRV${n}_CAM${n}_${EXPERIMENT_MACHINE}_${EXPERIMENT_SHIFT}_${EXPERIMENT_RESOLUTION}_${SEQUENCE}.csv
+					curl -Ss "http://localhost:19999/api/v1/data?chart=cgroup_${NAME_CONTAINER}.${metric}&format=csv&after=-${TIME_COLLECTION}&group=max&points=30&options=nonzero" > $RESULTS_DIR/$NSERVICES/${NAME_CONTAINER}_${metric}_SRV${n}_CAM${n}_${EXPERIMENT_MACHINE}_${EXPERIMENT_SHIFT}_${EXPERIMENT_RESOLUTION}_${SEQUENCE}.csv
 				done
 			done
 		done
@@ -309,6 +296,5 @@ do
 	for (( m=1; m<=$NUM_SCENARIOS; m++ )) # Select scenario
 	do
 		run_experiment $m $s
-		#echo "SCENARIO ${m} NUM SERVICES ${s}"
 	done
 done
