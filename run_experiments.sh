@@ -200,12 +200,7 @@ run_experiment()
 		for (( n=1; n<=$NSERVICES; n++ )) # Number of Services
 		do
 		docker container run -d --rm -ti $EXTRA_OPTIONS --name "capture-${n}" --net=arquitetura-network -e SERVICE_ID="SRV${n}" -e CAMERA_ID="CAM${n}" -e CAMERA_CONFIG_SOURCE=$CAMERA_CONFIG_SOURCE -e CAMERA_FRAME_WIDTH=$CAMERA_FRAME_WIDTH -e CAMERA_FRAME_HEIGHT=$CAMERA_FRAME_HEIGHT -e KAFKA_BROKER_URL="broker:9092" -e NEXT_MODULE="DETECTION" -v /opt/cam_videos:/usr/videos $IMAGE_CAPTURE
-		done
-		#sleep 10
-
-		echo ""
-		echo "##### RESTARTING NETDATA #####"
-		systemctl restart netdata
+		done	
 
 		echo ""
 		echo "##### INITIALIZING TIMER #####"
