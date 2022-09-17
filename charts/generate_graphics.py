@@ -13,17 +13,28 @@ from datetime import datetime
 #service_array=["SERVICE_FILTER","SERVICE_NFILTER"]
 #cam_per_service={"SERVICE_FILTER":"CAM_FILTER","SERVICE_NFILTER":"CAM_NFILTER"}
 
-target_array=["jetson","rpi4"]
-scenario_nservices={"jetson":[1,2,3],"rpi4":[1]}
-array_frame_resolution = {"single_service":["1920_1080","1200_800","960_540"], "multiple_services":["1920_1080"]}
+#rounds = 10
+rounds = 1
+
+##target_array=["jetson","rpi4"]
+target_array=["jetson"]
+
+##scenario_nservices={"jetson":[1,2,3],"rpi4":[1]}
+scenario_nservices={"jetson":[1],"rpi4":[1]}
+
+##array_frame_resolution = {"single_service":["1920_1080","1200_800","960_540"], "multiple_services":["1920_1080"]}
+array_frame_resolution = {"single_service":["1920_1080","1280_720","854_480"], "multiple_services":["1920_1080"]}
+
 factors = ["frame_resolution"]
 factors_title = {"frame_resolution":"Frame Resolution"}
-array_time = {"single_service":["high","low"],"multiple_services":["high"]}
+
+##array_time = {"single_service":["high","low"],"multiple_services":["high"]}
+array_time = {"single_service":["high"],"multiple_services":["high"]}
+
 containers=["capture","detection","filter"]#"zookeeper","broker"]
-#metrics_containers=["cpu_limit","cpu","cpu_per_core","mem_utilization","mem_usage_limit","mem_usage","mem","net_eth0","net_packets_eth0"]
+
 metrics_global={"jetson":["system.cpu","system.ram","system.net","system.ip","tegrastat_tegrastats.gpu_load","net.eth0","net_packets.eth0","net.br_b2970c97f922","net_packets.br_b2970c97f922","ipv4.packets"],
 "rpi4":["system.cpu","system.ram","system.net","system.ip","net.eth0","net_packets.eth0","ipv4.packets"]}
-
 metrics_containers=["cpu_limit","mem_usage","net_eth0","net_packets_eth0"]
 metrics_latency=["capture","send_detection","arrive_detection","detection","send_filter","arrive_filter","filter","send_storage","arrive_storage"]
 metrics_latency_defined = {"mod_cap_delay":["capture","send_detection"],
@@ -59,13 +70,6 @@ array_container_title={"capture":"Capture","detection":"Detection","filter":"Fil
 array_target_title={"jetson":"Jetson Xavier NX","rpi4":"Raspberry PI 4"}
 array_target_abr={"jetson":"Jetson","rpi4":"RPI4"}
 
-
-#metrics = ["cpu","mem","gpu","net"]
-#metrics_position = {"cpu":3,"mem":2,"gpu":1}
-#metrics_title = {"cpu":"CPU Utilization (%)","mem":"Memory Load (%)","gpu":"GPU Utilization (%)","net":"Outbound Traffic (kbps)"}
-#row_metrics_containers={"cpu_limit":1,"cpu":,"cpu_per_core","mem_utilization","mem_usage_limit","mem_usage","mem","net_eth0","net_packets_eth0"}
-#metrics_global=["system.cpu","system.ram","system.net","system.ip","services.cpu","services.mem_usage","apps.cpu","apps.mem","apps.vmem","tegrastat_tegrastats.gpu_load","net.eth0","net_packets.eth0","net.br_b2970c97f922","net_packets.br_b2970c97f922","ipv4.packets","ipv4.sockstat_sockets"]
-
 r = robjects.r
 r.library("nortest")
 r.library("MASS")
@@ -77,7 +81,7 @@ r('''
 wilcoxon_test_one_sample = robjects.r['wilcox.onesample.test']
 close_pdf = robjects.r('dev.off') 
 #confidence_interval = 0.05
-rounds = 10
+
 
 os.system("rm -rf ./figures")
 os.system("mkdir -p ./figures/eda/global ./figures/charts/global")
@@ -116,10 +120,10 @@ def get_value (row,metric,target):
     #GLOBAL - Total CPU utilization (all cores) (percentage)
     if metric == "system.cpu":
         #value1 = float(row[1]) + float(row[2]) + float(row[3]) + float(row[4]) + float(row[5])
-        if target == "jetson":
-            value1 = float(row[3])
-        else:
-            value1 = float(row[2]) 
+        #if target == "jetson":
+        #    value1 = float(row[3])
+        #else:
+        value1 = float(row[2]) 
     
     #GLOBAL - Physical RAM utilization (percentage)
     if metric == "system.ram":
