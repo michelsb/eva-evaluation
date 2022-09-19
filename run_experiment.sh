@@ -59,7 +59,7 @@ run_experiment()
     echo ""
     echo "## REMOTE DATA RETRIEVING ##"
 
-    scp -i ../.ssh/id_rsa $CLOUD_SERVER_USER@$CLOUD_SERVER_IP:$RESULTS_REMOTE_DIR/$SEQUENCE/* $RESULTS_LOCAL_DIR/$NSERVICES/.
+    scp -i ../.ssh/id_rsa $CLOUD_SERVER_USER@$CLOUD_SERVER_IP:$RESULTS_REMOTE_DIR/$SEQUENCE/stats*_*_*_${EXPERIMENT_MACHINE}_${EXPERIMENT_SHIFT}_${SCENARIO_NAME}_${SEQUENCE}.* $RESULTS_LOCAL_DIR/$NSERVICES/.
 
     echo ""
 	echo ">>>> FINISHING AT $(date) <<<<"

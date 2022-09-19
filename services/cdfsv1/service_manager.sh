@@ -33,7 +33,7 @@ start_services()
 		SERVICE_ID="SRV${n}"
 		CAMERA_ID="CAM${n}"
 		NAME_CREATED_CAPTURE="${CONTAINER_NAME_CAPTURE}-${n}"
-		eval "docker container run -d --rm -ti $EXTRA_OPTIONS --name $NAME_CREATED_CAPTURE --net=$DOCKER_NET -e SERVICE_ID=$SERVICE_ID -e CAMERA_ID=$CAMERA_ID $CAPTURE_OPTIONS -v $VIDEO_SOURCE_PATH:/usr/videos  $IMAGE_CAPTURE"
+		eval "docker container run -d --rm -ti $EXTRA_OPTIONS --name $NAME_CREATED_CAPTURE --net=$DOCKER_NET -e SERVICE_ID=$SERVICE_ID -e CAMERA_ID=$CAMERA_ID $CAPTURE_OPTIONS -v $VIDEO_SOURCE_PATH:/usr/videos $IMAGE_CAPTURE"
 	done
     sleep 10
 }
