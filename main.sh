@@ -19,7 +19,7 @@ echo "# STEP 1 # TESTING CLOUD SERVER CONNECTIVITY ##"
 echo ""
 
 ping -q -w 1 -c 1 $CLOUD_SERVER_IP > /dev/null && CONN=ok || CONN=error
-[ $CONN = ok ] && { echo "Cloud Server is available. Starting experiments...";} || { echo "ERROR: Cloud Server is not accessible. Exiting..."; exit 0; }
+[ $CONN = ok ] && { echo "Cloud Server is available. Initializing experiments...";} || { echo "ERROR: Cloud Server is not accessible. Exiting..."; exit 0; }
 
 # Defining variables
 RESULTS_LOCAL_DIR=services/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
@@ -54,7 +54,7 @@ docker network ls|grep $DOCKER_NET > /dev/null && NETEXISTS=ok || NETEXISTS=erro
 echo "Done!"
 
 echo ""
-echo "# STEP 5 # INITIALIZING EXPERIMENTS ##"
+echo "# STEP 5 # PERFORMING EXPERIMENTS ##"
 echo ""
 
 # Creating docker network
