@@ -13,21 +13,13 @@ echo "SELECTED DEVICE: $EXPERIMENT_MACHINE"
 echo "SELECTED SERVICE: $SERVICE_TYPE"
 echo "############################"
 
-echo ""
-echo "## SETTING IMAGES PER DEVICE TYPE ##"
-echo ""
-
-# Defining images for the device type (function from set_images.sh)
-get_images_per_device_type
-
 # Testing connectivity with cloud server
 echo ""
-echo "## TESTING CLOUD SERVER CONNECTIVITY ##"
+echo "# STEP 1 # TESTING CLOUD SERVER CONNECTIVITY ##"
 echo ""
 
 ping -q -w 1 -c 1 $CLOUD_SERVER_IP > /dev/null && CONN=ok || CONN=error
 [ $CONN = ok ] && { echo "Cloud Server is available. Starting experiments...";} || { echo "ERROR: Cloud Server is not accessible. Exiting..."; exit 0; }
-echo ""
 
 # Defining variables
 RESULTS_LOCAL_DIR=services/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
@@ -35,14 +27,23 @@ RESULTS_REMOTE_DIR=/home/$CLOUD_SERVER_USER/eva-storage/$SERVICE_TYPE/results_$E
 BROKER_IP=$(ip -4 addr show $MAIN_INTERFACE | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 echo ""
-echo "## CLEANING OLD SERVICES ##"
+echo "# STEP 2 # SETTING IMAGES PER DEVICE TYPE ##"
+echo ""
+
+# Defining images for the device type (function from set_images.sh)
+get_images_per_device_type
+echo "Done!"
+
+echo ""
+echo "# STEP 3 # CLEANING OLD SERVICES ##"
 echo ""
 
 # Function to stop old containers (from service_manager.sh)
 stop_services
+echo "Done!"
 
 echo ""
-echo "## CLEANING OLD FILES AND DOCKER NETWORK ##"
+echo "# STEP 4 # CLEANING OLD FILES AND DOCKER NETWORK ##"
 echo ""
 
 rm -rf $RESULTS_LOCAL_DIR
@@ -50,9 +51,10 @@ ssh -i ../.ssh/id_rsa $CLOUD_SERVER_USER@$CLOUD_SERVER_IP "rm -rf $RESULTS_REMOT
 echo "Old files removed"
 docker network ls|grep $DOCKER_NET > /dev/null && NETEXISTS=ok || NETEXISTS=error
 [ $NETEXISTS = ok ] && { echo "Old docker network $DOCKER_NET found. Removing..."; docker network rm $DOCKER_NET;} || { echo "No docker network $DOCKER_NET found";}
+echo "Done!"
 
 echo ""
-echo "## INITIALIZING EXPERIMENTS ##"
+echo "# STEP 5 # INITIALIZING EXPERIMENTS ##"
 echo ""
 
 # Creating docker network
