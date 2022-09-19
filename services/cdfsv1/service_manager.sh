@@ -4,9 +4,9 @@ start_services()
 {
     echo ""
 	echo "# RUNNING BROKER MODULE"
-    docker run -d --rm --name $CONTAINER_NAME_ZOOKEEPER --net=$DOCKER_NET -p 2181:2181 $IMAGE_ZOOKEEPER	
+    eval "docker run -d --rm --name $CONTAINER_NAME_ZOOKEEPER --net=$DOCKER_NET -p 2181:2181 $IMAGE_ZOOKEEPER"
     sleep 10
-	docker run -d --rm --name $CONTAINER_NAME_KAFKA --net=$DOCKER_NET -p 29092:29092 $KAFKA_OPTIONS $IMAGE_KAFKA    
+	eval "docker run -d --rm --name $CONTAINER_NAME_KAFKA --net=$DOCKER_NET -p 29092:29092 $KAFKA_OPTIONS $IMAGE_KAFKA"    
 	sleep $WAIT_KAFKA
 
     echo ""
@@ -17,8 +17,12 @@ start_services()
 	echo "# RUNNING DETECTION AND FILTER MODULES"
 	for (( n=1; n<=$NSERVICES; n++ )) # Number of Services
 	do
-		docker container run -d --rm -ti $EXTRA_OPTIONS --name "${CONTAINER_NAME_FILTER}-${n}" --net=$DOCKER_NET -e SERVICE_ID="SRV${n}" -e CAMERA_ID="CAM${n}" -e KAFKA_BROKER_URL="$CONTAINER_NAME_KAFKA:9092" -e NEXT_MODULE="" -e PREVIOUS_MODULE="DETECTION" $FILTER_OPTIONS $IMAGE_FILTER
-        docker container run -d --rm -ti $EXTRA_OPTIONS --name "${CONTAINER_NAME_DETECTION}-${n}" --net=$DOCKER_NET -e SERVICE_ID="SRV${n}" -e CAMERA_ID="CAM${n}" -e KAFKA_BROKER_URL="$CONTAINER_NAME_KAFKA:9092" -e NEXT_MODULE="FILTER" -e PREVIOUS_MODULE="CAPTURE" $DETECTION_OPTIONS $IMAGE_DETECTION
+		SERVICE_ID="SRV${n}"
+		CAMERA_ID="CAM${n}"
+		NAME_CREATED_FILTER="${CONTAINER_NAME_FILTER}-${n}"
+		NAME_CREATED_DETECTION="${CONTAINER_NAME_DETECTION}-${n}"
+		eval "docker container run -d --rm -ti $EXTRA_OPTIONS --name $NAME_CREATED_FILTER --net=$DOCKER_NET -e SERVICE_ID=$SERVICE_ID -e CAMERA_ID=$CAMERA_ID $FILTER_OPTIONS $IMAGE_FILTER"
+        eval "docker container run -d --rm -ti $EXTRA_OPTIONS --name $NAME_CREATED_DETECTION --net=$DOCKER_NET -e SERVICE_ID=$SERVICE_ID -e CAMERA_ID=$CAMERA_ID $DETECTION_OPTIONS $IMAGE_DETECTION"
     done
 	sleep 10
 
@@ -26,7 +30,10 @@ start_services()
 	echo "# RUNNING CAPTURING MODULE"		
 	for (( n=1; n<=$NSERVICES; n++ )) # Number of Services
 	do
-		docker container run -d --rm -ti $EXTRA_OPTIONS --name "${CONTAINER_NAME_CAPTURE}-${n}" --net=$DOCKER_NET -e SERVICE_ID="SRV${n}" -e CAMERA_ID="CAM${n}" -e KAFKA_BROKER_URL="${CONTAINER_NAME_KAFKA}:9092" -e NEXT_MODULE="DETECTION" -v $VIDEO_SOURCE_PATH:/usr/videos $CAPTURE_OPTIONS $IMAGE_CAPTURE
+		SERVICE_ID="SRV${n}"
+		CAMERA_ID="CAM${n}"
+		NAME_CREATED_CAPTURE="${CONTAINER_NAME_CAPTURE}-${n}"
+		eval "docker container run -d --rm -ti $EXTRA_OPTIONS --name $NAME_CREATED_CAPTURE --net=$DOCKER_NET -e SERVICE_ID=$SERVICE_ID -e CAMERA_ID=$CAMERA_ID $CAPTURE_OPTIONS -v $VIDEO_SOURCE_PATH:/usr/videos  $IMAGE_CAPTURE"
 	done
     sleep 10
 }

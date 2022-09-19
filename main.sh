@@ -2,6 +2,10 @@
 
 # Creating environment variables (general configuration)
 . environment.sh
+# Defining variables
+RESULTS_LOCAL_DIR=services/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
+RESULTS_REMOTE_DIR=/home/$CLOUD_SERVER_USER/eva-storage/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
+BROKER_IP=$(ip -4 addr show $MAIN_INTERFACE | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 # Importing packages
 . services/$SERVICE_TYPE/set_images.sh
 . services/$SERVICE_TYPE/set_scenarios.sh
@@ -20,11 +24,6 @@ echo ""
 
 ping -q -w 1 -c 1 $CLOUD_SERVER_IP > /dev/null && CONN=ok || CONN=error
 [ $CONN = ok ] && { echo "Cloud Server is available. Initializing experiments...";} || { echo "ERROR: Cloud Server is not accessible. Exiting..."; exit 0; }
-
-# Defining variables
-RESULTS_LOCAL_DIR=services/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
-RESULTS_REMOTE_DIR=/home/$CLOUD_SERVER_USER/eva-storage/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
-BROKER_IP=$(ip -4 addr show $MAIN_INTERFACE | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 echo ""
 echo "# STEP 2 # SETTING IMAGES PER DEVICE TYPE ##"
