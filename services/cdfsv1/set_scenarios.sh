@@ -35,26 +35,8 @@ get_scenario()
 			EXPERIMENT_SHIFT="high"
 			kafka_retetion_enabled=false	
 			;;
-		2) 	
+		2) 
 			echo ">>>> SCENARIO 2 <<<<<"
-			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_720
-			CAMERA_FRAME_WIDTH="1280"
-			CAMERA_FRAME_HEIGHT="720"
-			SCENARIO_NAME="1280_720_NKR"
-			EXPERIMENT_SHIFT="high"	
-			kafka_retetion_enabled=false
-			;;
-		3) 	
-			echo ">>>> SCENARIO 3 <<<<<"
-			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_480
-			CAMERA_FRAME_WIDTH="854"
-			CAMERA_FRAME_HEIGHT="480"
-			SCENARIO_NAME="854_480_NKR"
-			EXPERIMENT_SHIFT="high"
-			kafka_retetion_enabled=false
-			;;
-		4) 
-			echo ">>>> SCENARIO 4 <<<<<"
 			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_FULL
 			CAMERA_FRAME_WIDTH="1920"
 			CAMERA_FRAME_HEIGHT="1080"
@@ -62,14 +44,32 @@ get_scenario()
 			EXPERIMENT_SHIFT="high"
 			kafka_retetion_enabled=true				
 			;;
-		5) 	
-			echo ">>>> SCENARIO 5 <<<<<"
+		3) 	
+			echo ">>>> SCENARIO 3 <<<<<"
+			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_720
+			CAMERA_FRAME_WIDTH="1280"
+			CAMERA_FRAME_HEIGHT="720"
+			SCENARIO_NAME="1280_720_NKR"
+			EXPERIMENT_SHIFT="high"	
+			kafka_retetion_enabled=false
+			;;
+		4) 	
+			echo ">>>> SCENARIO 4 <<<<<"
 			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_720
 			CAMERA_FRAME_WIDTH="1280"
 			CAMERA_FRAME_HEIGHT="720"
 			SCENARIO_NAME="1280_720_KR"
 			EXPERIMENT_SHIFT="high"
 			kafka_retetion_enabled=true	
+			;;
+		5) 	
+			echo ">>>> SCENARIO 5 <<<<<"
+			CAMERA_CONFIG_SOURCE=$VIDEO_HIGH_TRAFFIC_480
+			CAMERA_FRAME_WIDTH="854"
+			CAMERA_FRAME_HEIGHT="480"
+			SCENARIO_NAME="854_480_NKR"
+			EXPERIMENT_SHIFT="high"
+			kafka_retetion_enabled=false
 			;;
 		6) 	
 			echo ">>>> SCENARIO 6 <<<<<"
