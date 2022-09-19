@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ContainerArray=("filter"  "detection"  "capture"  "zookeeper"  "broker")
 IMAGE_STORAGE="alessilva/eva-storage:2022-05-12"
 
 get_images_per_device_type()

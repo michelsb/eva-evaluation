@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ContainerArray=("filter"  "detection"  "capture"  "zookeeper"  "broker")
+
 # List available videos here
 VIDEO_HIGH_TRAFFIC_FULL="/usr/videos/manha_muito_movimento_traseira_full_15pfs.mp4"
 VIDEO_HIGH_TRAFFIC_720="/usr/videos/manha_muito_movimento_traseira_720p_15pfs.mp4"

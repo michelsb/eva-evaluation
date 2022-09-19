@@ -32,7 +32,6 @@ echo ""
 # Defining variables
 RESULTS_LOCAL_DIR=services/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
 RESULTS_REMOTE_DIR=/home/$CLOUD_SERVER_USER/eva-storage/$SERVICE_TYPE/results_$EXPERIMENT_MACHINE
-SEQ_NSERVICES=$(seq 1 1 $NUMBER_OF_SERVICES)
 BROKER_IP=$(ip -4 addr show $MAIN_INTERFACE | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 echo ""
@@ -65,18 +64,18 @@ bridge_name="br-${network_id:0:12}"
 MetricArrayPerContainer=("cpu_limit" "cpu" "cpu_per_core" "mem_utilization" "mem_usage_limit" "mem_usage" "mem" "net_eth0" "net_packets_eth0")
 MetricArrayGlobal=("system.cpu" "system.ram" "system.net" "system.ip" "services.cpu" "services.mem_usage" "apps.cpu" "apps.mem" "apps.vmem" "tegrastat_tegrastats.gpu_load" "net.$MAIN_INTERFACE" "net_packets.$MAIN_INTERFACE" "net.$bridge_name" "net_packets.$bridge_name" "ipv4.packets" "ipv4.sockstat_sockets")
 # Loop in total services running in the device
-for s in $SEQ_NSERVICES
+for s in $SEQ_NSERVICES;
 do	
 	# Creating directories to store results, both locally and remotelly
 	mkdir -p $RESULTS_LOCAL_DIR/$s
 	ssh -i ../.ssh/id_rsa $CLOUD_SERVER_USER@$CLOUD_SERVER_IP "mkdir -p $RESULTS_REMOTE_DIR/$s"
 	# Loop in scenarios
-	for (( m=1; m<=$NUMBER_OF_SCENARIOS; m++ )) 
+	for (( m=1; m<=$NUMBER_OF_SCENARIOS; m++ )); 
 	do
 		# Configure scenario (from set_scenario.sh)
 		get_scenario $m
 		# Loop in the rounds
-		for (( r=1; r<=$ROUNDS; r++ )) 
+		for (( r=1; r<=$ROUNDS; r++ )); 
 		do
 			# Cleaning cache memory
     		sync; echo 3 > /proc/sys/vm/drop_caches
