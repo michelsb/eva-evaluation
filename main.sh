@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Creating environment variables (general configuration)
-export $(cat .env | grep "#" -v)
+. environment.sh
 # Importing packages
-. /services/$SERVICE_TYPE/set_images.sh
-. /services/$SERVICE_TYPE/set_scenarios.sh
-. /services/$SERVICE_TYPE/service_manager.sh
+. services/$SERVICE_TYPE/set_images.sh
+. services/$SERVICE_TYPE/set_scenarios.sh
+. services/$SERVICE_TYPE/service_manager.sh
 . run_experiment.sh
 
 echo "############################"
